@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Save Form Into Database Demo</title>
+    <meta charset="utf-8">
+    <style>
+    /* (X) NOT IMPORTANT - COSMETICS */
+    * {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+    form {
+      max-width: 400px;
+      padding: 20px;
+      border: 1px solid #eee;
+      background: #f7f7f7;
+    }
+    label, input {
+      display: block;
+      width: 100%;
+    }
+    label { padding: 10px 0; }
+    input { padding: 10px; }
+    input[type=text], input[type=email] { border: 1px solid #d1d1d1; }
+    input[type=submit] {
+      margin-top: 20px;
+      border: 0;
+      cursor: pointer;
+      color: #fff;
+      background: #515fbf;
+    }
+    aside { display: inline-flex; }
+    </style>
+  </head>
+  <body>
+    <!-- (A) HTML FORM -->
+    <form method="post" id="demo" onsubmit="return goForm()">
+      <label>Email</label>
+      <input type="email" name="email" required value="jon@doe.com">
+      <label>Text</label>
+      <input type="text" name="txt" required value="It works!">
+      <input type="submit" value="Go!">
+    </form>
+    <aside>
+      <div>
+        <p>Comments</p>
+        <button onclick="return getComments()">Get comments</button>
+        <ul id="comments"></ul>
+      </div>
+      <div>
+        <p>Emails</p>
+        <button onclick="return getEmails()">Get emails</button>
+        <ul id="emails"></ul>
+      </div>
+    </aside>
+    <!-- (B) AJAX SUBMIT -->
+    <script>
+    function goForm () {
+      // (B1) GET HTML FORM
+      var data = new FormData(document.getElementById("demo"));
+
+      // (B2) AJAX SUBMIT
+      fetch("/go", { method:"POST", body:data })
+      .then(res => res.text())
+      .then(txt => alert(txt))
+      .catch(err => console.error(err));
+      return false;
+    }
+    function getEmails () {
+      fetch("/emails", { method: "GET" }).then(res => res.json()).then(
+        responseJson => {
+          if(responseJson.length > 0) {
+            const id = document.getElementById("emails");
+            id.innerHTML = "";
+            responseJson.forEach(element => {
+              const item = document.createElement("li");
+              item.textContent = element.email;
+              id.appendChild(item);
+            });
+          }
+
+        }
+      )
+    }
+    function getComments () {
+      fetch("/comments", { method: "GET" }).then(res => res.json()).then(
+        responseJson => {
+          if(responseJson.length > 0) {
+            const id = document.getElementById("comments");
+            id.innerHTML = "";
+            responseJson.forEach(element => {
+              const item = document.createElement("li");
+              item.textContent = element.txt;
+              id.appendChild(item);
+            });
+          }
+
+        }
+      )
+    }
+    </script>
+  </body>
+</html>
